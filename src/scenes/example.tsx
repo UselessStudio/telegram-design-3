@@ -65,4 +65,9 @@ export default makeScene2D(function* (view) {
   yield* prevScreen().opacity(0.3, 0.5, easeInOutCubic);
 
   yield* waitFor(1);
+
+  yield* tween(0.8, value => {
+    title().position.y(map(-425, 0, easeOutExpo(value)));
+    screen().position.y(map(150, 800, easeOutExpo(value)));
+  });
 });

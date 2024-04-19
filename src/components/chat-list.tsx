@@ -1,5 +1,5 @@
-import {Img, Node, NodeProps, Rect, Txt} from "@motion-canvas/2d";
-import {PossibleColor} from "@motion-canvas/core";
+import { Img, Node, NodeProps, Rect, Txt } from "@motion-canvas/2d";
+import { PossibleColor } from "@motion-canvas/core";
 
 interface ChatProps {
     name: string;
@@ -12,7 +12,7 @@ export class ChatList extends Node {
     constructor(props?: NodeProps & ChatProps) {
         super(props);
         this.add(<Rect alignItems="stretch" gap={5} marginTop={2}>
-            <Img margin={10} src="/avatar.jpg" radius={50} width={90}/>
+            <Img margin={10} src="/avatar.jpg" radius={50} width={90} />
             <Rect direction="column" grow={1} justifyContent="space-between">
                 <Rect grow={1} alignItems="center">
                     <Rect direction="column" gap={8}>
@@ -27,16 +27,15 @@ export class ChatList extends Node {
                         <Txt fontFamily="Roboto" fill="black" fontSize={22} fontWeight={400} offsetX={-1} opacity={0.6}>
                             9:04
                         </Txt>
-                        <Rect fill="lightgrey" padding={8} radius={20}>
+                        <Rect fill="lightgrey" padding={8} radius={18}>
                             <Txt fontFamily="Roboto" fill="white" fontSize={22} fontWeight={400} offsetX={-1} marginBottom={-5}>
                                 29
                             </Txt>
                         </Rect>
                     </Rect>
                 </Rect>
-                <Rect height={1} fill={"black"} opacity={0.3}/>
+                <Rect height={1} fill={"black"} opacity={0.3} />
             </Rect>
-
         </Rect>);
     }
 }
