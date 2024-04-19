@@ -12,10 +12,12 @@ export class PhoneScreen extends Node {
     private readonly container: Reference<Rect>;
     private firstScreen: Reference<Rect>;
     private secondScreen: Reference<Rect>;
+    private statusbar: Reference<Img>;
     constructor(props?: NodeProps) {
         super(props);
         this.container = createRef<Rect>();
         this.firstScreen = createRef<Rect>();
+        this.statusbar = createRef<Img>();
         this.add(
             <Rect radius={SCREEN_RADIUS}
                   x={this.x} y={this.y}
@@ -29,6 +31,7 @@ export class PhoneScreen extends Node {
                     </Rect>
                 </Rect>
                 <Img src="/statusbar.svg"
+                     ref={this.statusbar}
                      width={SCREEN_WIDTH - SCREEN_BORDER*2}
                      y={-SCREEN_HEIGHT/2+SCREEN_BORDER+10}
                      offsetY={-1}/>
@@ -40,6 +43,11 @@ export class PhoneScreen extends Node {
                 </Rect>
             </Rect>,
         );
+    }
+
+    public *setTheme(dark: boolean) {
+        this.statusbar().src(dark ? "/dark-status.svg" : "/statusbar.svg");
+        yield* this.statusbar().opacity(0).opacity(1, 0.2, easeInOutCubic);
     }
 
     public *transitionTo(node: ComponentChildren) {

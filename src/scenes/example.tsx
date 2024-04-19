@@ -1,5 +1,6 @@
-import {Rect, makeScene2D, Gradient, Txt, Img, Node} from '@motion-canvas/2d';
+import {Rect, makeScene2D, Gradient, Txt, Img, Node, Video} from '@motion-canvas/2d';
 import {
+  all,
   createRef, easeInOutCubic,
   easeOutExpo,
   map,
@@ -12,6 +13,8 @@ import { ChatHeader } from '../components/android/chat-header.js';
 import {MainHeader} from "../components/android/main-header.js";
 import {ChatList} from "../components/chat-list.js";
 import {ChatDropdown} from "../components/android/chat-dropdown.js";
+import { PasscodeHeader } from '../components/android/passcode-header.js';
+import {PasscodeInput} from "../components/android/passcode-input.js";
 
 const PRIMARY = "#1eb283";
 
@@ -48,17 +51,49 @@ export default makeScene2D(function* (view) {
     screen().position.y(map(800, 150, easeOutExpo(value)));
   });
   const click = createRef<ClickMarker>();
-  view.add(<ClickMarker ref={click}/>);
+  view.add(<ClickMarker zIndex={10} ref={click}/>);
   yield* click().click(0, 0);
+  yield* all(
+      click().endClick(),
+      screen().transitionTo(<Rect direction="column" fill="white">
+        <ChatHeader name="Воробей - и точка" members={67} color={PRIMARY}/>
+      </Rect>)
+  );
 
   const dropdown = createRef<ChatDropdown>();
-  yield* screen().transitionTo(<Rect direction="column" fill="white">
-    <ChatHeader name="Воробей - и точка" members={67} color={PRIMARY}/>
-    <ChatDropdown ref={dropdown} opacity={0} />
-  </Rect>);
+  view.add(<ChatDropdown ref={dropdown} x={330} y={-230} />);
 
-  // yield* dropdown().open();
-  yield* waitFor(1);
+  yield* click().click(300, -200);
+
+  yield* all(
+      click().endClick(),
+      dropdown().open(),
+  );
+
+  yield* click().click(200, 35);
+  yield* all(
+      click().endClick(),
+      dropdown().close(),
+  );
+
+  const passcode = createRef<PasscodeInput>();
+  yield* screen().transitionTo(<Rect direction="column" fill="white">
+    <PasscodeHeader/>
+    <Rect alignItems="center" direction="column">
+      <Video play={true} src="/key.mp4" width={200} margin={20}/>
+      <Txt fontFamily="Roboto" fontWeight={600} fontSize={28} margin={10}>Enter new passcode</Txt>
+      <Rect fontFamily="Roboto" fontWeight={400} fontSize={25} opacity={0.5} direction="column" alignItems="center">
+        <Txt>Please enter any 4 digits that you will use to unlock </Txt>
+        <Txt>the chat with <Txt fontWeight={500}>Pavel Durov</Txt>.</Txt>
+      </Rect>
+      <PasscodeInput ref={passcode}/>
+      {/*<Img src="/keypad.svg"/>*/}
+    </Rect>
+  </Rect>);
+  yield* screen().setTheme(true);
+  yield* passcode().unlock();
+
+  yield* waitFor(3);
 
   yield* tween(0.8, value => {
     title().position.y(map(-425, 0, easeOutExpo(value)));

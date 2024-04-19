@@ -1,5 +1,17 @@
 import {Circle, Node, NodeProps, Txt} from "@motion-canvas/2d";
-import {all, chain, createRef, easeInCubic, easeOutCubic, easeOutExpo, easeOutSine, map, Reference, tween} from "@motion-canvas/core";
+import {
+    all,
+    chain,
+    createRef,
+    easeInCubic,
+    easeInOutCubic,
+    easeOutCubic,
+    easeOutExpo,
+    easeOutSine,
+    map,
+    Reference,
+    tween
+} from "@motion-canvas/core";
 
 export class ClickMarker extends Node {
     private readonly circle: Reference<Circle>;
@@ -13,23 +25,23 @@ export class ClickMarker extends Node {
     }
 
     public *click(x: number, y: number) {
-        this.position.x(x);
-        this.position.y(y);
-        yield* tween(0.2, value => {
-            this.circle().opacity(map(0, 1, easeInCubic(value)));
-            this.circle().size(map(200, 250, easeOutSine(value)));
-            this.circle().lineWidth(map(50, 70, easeOutSine(value)));
-        });
-        yield chain(
-            tween(0.1, value => {
-                this.circle().size(map(250, 100, easeOutExpo(value)));
-                this.circle().lineWidth(map(70, 40, easeOutExpo(value)));
-            }),
-            tween(0.2, value => {
-                this.circle().opacity(map(1, 0.5, easeOutCubic(value)));
-                this.circle().size(map(100, 300, easeOutExpo(value)));
-                this.circle().lineWidth(map(40, 0, easeOutExpo(value)));
-            })
+        this.position.x(x).y(y);
+        this.circle().opacity(0).size(200).lineWidth(50);
+        yield* all(
+            this.circle().opacity(1, 0.2, easeInOutCubic),
+            this.circle().size(250, 0.2, easeInOutCubic),
+            this.circle().lineWidth(50, 0.2, easeInOutCubic),
+        );
+    }
+    public *endClick() {
+        yield* all(
+            this.circle().size(100, 0.1, easeInOutCubic),
+            this.circle().lineWidth(40, 0.1, easeInOutCubic),
+        );
+        yield* all(
+            this.circle().opacity(0.5, 0.2, easeInOutCubic),
+            this.circle().size(300, 0.2, easeInOutCubic),
+            this.circle().lineWidth(0, 0.2, easeInOutCubic),
         );
     }
 }
