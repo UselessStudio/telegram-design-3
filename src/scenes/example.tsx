@@ -11,6 +11,7 @@ import {ClickMarker} from "../components/click.js";
 import { ChatHeader } from '../components/android/chat-header.js';
 import {MainHeader} from "../components/android/main-header.js";
 import {ChatList} from "../components/chat-list.js";
+import {ChatDropdown} from "../components/android/chat-dropdown.js";
 
 const PRIMARY = "#1eb283";
 
@@ -30,22 +31,15 @@ export default makeScene2D(function* (view) {
   const title = createRef<Txt>();
   view.add(<Txt ref={title} fill="white" fontFamily="Roboto" fontWeight={700} fontSize={70}>Telegram Contest demo</Txt>);
   const screen = createRef<PhoneScreen>();
-  const container = createRef<Node>();
-  const prevScreen = createRef<Rect>();
   view.add(<PhoneScreen x={0} y={800} ref={screen}>
-    <Rect ref={container} direction="row" fill="black">
-      <Rect direction="column" ref={prevScreen} fill="white">
-        <MainHeader color={PRIMARY}/>
-        <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
-        <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
-        <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
-        <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
-        <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
-        <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
-        <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
-      </Rect>
-
-    </Rect>
+    <MainHeader color={PRIMARY}/>
+    <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
+    <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
+    <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
+    <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
+    <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
+    <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
+    <ChatList color={PRIMARY} name="Воробей - и точка" author="Valera" message="Отуп ро озо"/>
   </PhoneScreen>);
   yield* waitFor(0.5);
 
@@ -57,13 +51,13 @@ export default makeScene2D(function* (view) {
   view.add(<ClickMarker ref={click}/>);
   yield* click().click(0, 0);
 
-  const chat = createRef<Rect>();
-  container().add(<Rect direction="column" ref={chat} fill="white">
-    <ChatHeader name="Воробей - и точка" members={66} color={PRIMARY}/>
+  const dropdown = createRef<ChatDropdown>();
+  yield* screen().transitionTo(<Rect direction="column" fill="white">
+    <ChatHeader name="Воробей - и точка" members={67} color={PRIMARY}/>
+    <ChatDropdown ref={dropdown} opacity={0} />
   </Rect>);
-  yield chat().margin.left(-SCREEN_WIDTH + SCREEN_BORDER*2, 0.5, easeInOutCubic);
-  yield* prevScreen().opacity(0.3, 0.5, easeInOutCubic);
 
+  // yield* dropdown().open();
   yield* waitFor(1);
 
   yield* tween(0.8, value => {
