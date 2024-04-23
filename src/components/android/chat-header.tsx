@@ -15,13 +15,13 @@ export class ChatHeader extends Node {
         this.add(<AndroidHeader color={props.color}>
             <Rect gap={20} alignItems="center">
                 <Icon icon="material-symbols:arrow-back-rounded" color="white" size={40}/>
-                <Img src="/avatar.jpg" radius={50} width={70}/>
+                <Img src="/avatars/durov.jpg" radius={50} width={70}/>
                 <Rect direction="column">
                     <Txt fontFamily="Roboto" fill="white" fontSize={30} fontWeight={500} offsetX={-1}>
                         {props.name}
                     </Txt>
                     <Txt fontFamily="Roboto" fill="white" fontSize={20} fontWeight={400} offsetX={-1} opacity={0.8}>
-                        {props.members.toString()} members
+                        last seen recently
                     </Txt>
                 </Rect>
             </Rect>

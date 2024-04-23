@@ -6,7 +6,7 @@ export class AndroidHeader extends Node {
     constructor(props?: NodeProps & {color: PossibleColor}) {
         super(props);
 
-        this.add(<Rect fill={props.color} direction="column" alignItems="center" justifyContent="end" paddingTop={70}>
+        this.add(<Rect fill={props.color} direction="column" alignItems="center" justifyContent="end" paddingTop={50}>
             <Rect width={SCREEN_WIDTH - SCREEN_BORDER * 2} height={100} paddingLeft={25} paddingRight={25}
                        alignItems="center" justifyContent="space-between">
                 {this.children()}
