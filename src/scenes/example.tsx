@@ -1,10 +1,10 @@
 import {Rect, makeScene2D, Gradient, Txt, Img, Node, Video, blur, Circle} from '@motion-canvas/2d';
 import {
-  all, any,
+  all, any, chain,
   createRef, createRefMap, createSignal, easeInOutCubic,
   easeOutExpo, linear,
   map,
-  tween,
+  tween, useRandom,
   waitFor
 } from '@motion-canvas/core';
 import {PhoneScreen, SCREEN_BORDER, SCREEN_HEIGHT, SCREEN_RADIUS, SCREEN_WIDTH} from "../components/phone.js";
@@ -58,9 +58,9 @@ export default makeScene2D(function* (view) {
         <ChatHeader name="Pavel Durov" members={67} color={PRIMARY} zIndex={2}/>
         <Img src="/dialog.svg" width={SCREEN_WIDTH - SCREEN_BORDER * 2} marginTop={-40}/>
         <Rect layout={false} ref={chat}>
-          <Img ref={messages} src="/messages.svg" width={SCREEN_WIDTH - SCREEN_BORDER * 2} x={-15} offsetY={1} y={520}/>
+          <Img ref={messages} src="/messages.svg" width={SCREEN_WIDTH - SCREEN_BORDER * 2} offsetY={1} y={520}/>
         </Rect>
-        <Img src="/message-bar.svg" width={SCREEN_WIDTH} marginTop={-91}/>
+        <Img src="/message-bar.svg" width={SCREEN_WIDTH - SCREEN_BORDER*2} marginTop={-91}/>
       </Rect>)
   );
   yield* all(
@@ -77,13 +77,14 @@ export default makeScene2D(function* (view) {
   const video = createRef<Video>();
   const button = createRef<Img>();
   const lock = createRef<Img>();
+  const circle = createRef<Circle>();
   const progress = createSignal(0);
   const number = createSignal(0);
   view.add(<Rect width={SCREEN_WIDTH- SCREEN_BORDER*2} height={SCREEN_HEIGHT - SCREEN_BORDER*2} ref={container}
                  scale={screen().scale} radius={45} clip={true} opacity={0}>
     <Video ref={video} play={true} src="/video.mp4" radius={300}
            width={SCREEN_WIDTH - SCREEN_BORDER*2 - 50} y={500} scale={0.5} zIndex={5}/>
-    <Circle size={SCREEN_WIDTH - SCREEN_BORDER*2 - 25} stroke="white" lineWidth={5} lineCap="round"
+    <Circle size={SCREEN_WIDTH - SCREEN_BORDER*2 - 25} stroke="white" lineWidth={5} lineCap="round" y={-50}
             startAngle={-90} endAngle={createSignal(() => progress()*360-90)}/>
     <Img src="/video-bar.svg" width={SCREEN_WIDTH - SCREEN_BORDER * 2} y={SCREEN_HEIGHT/2-52} offsetY={1}/>
     <Txt fill="#999798" offsetX={-1}
@@ -107,7 +108,7 @@ export default makeScene2D(function* (view) {
   yield* all(
       screen().setBlur(true),
       container().opacity(1, 0.3, easeInOutCubic),
-      video().y(0, 0.3, easeInOutCubic),
+      video().y(-50, 0.3, easeInOutCubic),
       video().scale(1, 0.3, easeInOutCubic),
   );
 
@@ -131,14 +132,15 @@ export default makeScene2D(function* (view) {
   const video1 = createRef<Video>();
   container().add(
       <Video ref={video1} play={false} src="/video.mp4" radius={300} opacity={0.8}
-             width={SCREEN_WIDTH - SCREEN_BORDER*2 - 50} y={0} zIndex={5}/>
+             width={SCREEN_WIDTH - SCREEN_BORDER*2 - 50} y={0} zIndex={1}/>
   );
   video1().seek(4);
   yield counter().opacity(1, 0.2, easeInOutCubic);
   number(2);
   yield all(
-      video1().scale(0.4, 0.3, easeInOutCubic),
-      video1().y(-440, 0.3, easeInOutCubic),
+      video1().scale(0.25, 0.3, easeInOutCubic),
+      video1().y(350, 0.3, easeInOutCubic),
+      video1().x(-210, 0.3, easeInOutCubic),
   );
   yield* waitFor(4);
 
@@ -146,36 +148,18 @@ export default makeScene2D(function* (view) {
   yield progress(1, 4, linear);
   const video2 = createRef<Video>();
   container().add(
-      <Video ref={video2} play={false} src="/video.mp4" radius={300} opacity={0.8}
-             width={SCREEN_WIDTH - SCREEN_BORDER*2 - 50} y={0} zIndex={5}/>
+      <Video ref={video2} play={false} src="/video.mp4" radius={300} opacity={0.8} scale={0.85}
+             width={SCREEN_WIDTH - SCREEN_BORDER*2 - 50} y={0} zIndex={1}/>
   );
   video2().seek(8);
   number(3);
   yield all(
-      video2().scale(0.4, 0.3, easeInOutCubic),
-      video2().y(-440, 0.3, easeInOutCubic),
-      video1().x(-100, 0.3, easeInOutCubic),
-      video2().x(100, 0.3, easeInOutCubic),
+      video2().scale(0.25, 0.3, easeInOutCubic),
+      video2().y(350, 0.3, easeInOutCubic),
+      video2().x(-160, 0.3, easeInOutCubic),
   );
   yield* waitFor(4);
 
-  progress(0);
-  yield progress(1, 4, linear);
-  const video3 = createRef<Video>();
-  container().add(
-      <Video ref={video3} play={false} src="/video.mp4" radius={300} opacity={0.8}
-             width={SCREEN_WIDTH - SCREEN_BORDER*2 - 50} y={0} zIndex={5}/>
-  );
-  video3().seek(12);
-  number(4);
-  yield all(
-      video3().scale(0.4, 0.3, easeInOutCubic),
-      video3().y(-440, 0.3, easeInOutCubic),
-      video1().x(-120, 0.3, easeInOutCubic),
-      video2().x(0, 0.3, easeInOutCubic),
-      video3().x(120, 0.3, easeInOutCubic),
-  );
-  yield* waitFor(3);
   yield* click().click(205, 435);
   yield* click().endClick();
 
@@ -184,15 +168,114 @@ export default makeScene2D(function* (view) {
       container().opacity(0, 0.2, easeInOutCubic),
   );
   const message = createRef<Rect>();
-  chat().add(<Rect ref={message} height={300} y={550} offsetY={-1} x={SCREEN_WIDTH/2 - SCREEN_BORDER - 30}>
-    <Video play={true} src="/video.mp4" radius={300} offsetX={1}/>
+  const videoMessage = createRef<Video>();
+  const v1 = createRef<Video>();
+  const v2 = createRef<Video>();
+  const circleProgress = createRef<Circle>();
+  const progressIndicator = createRef<Rect>();
+  const bar1 = createRef<Rect>();
+  const bar2 = createRef<Rect>();
+  const bar3 = createRef<Rect>();
+  const unread = createRef<Circle>();
+  const bars = createRef<Rect>();
+  progress(3);
+  chat().add(<Rect y={550} x={SCREEN_WIDTH/2 - SCREEN_BORDER-10}>
+    <Rect ref={message} height={300} offsetY={-1}>
+      <Video ref={v2} play={false} src="/video.mp4" radius={300} opacity={0.4} scale={0.9} x={-160}/>
+      <Video ref={v1} play={false} src="/video.mp4" radius={300} opacity={0.6} scale={0.9} x={-160}/>
+      <Video ref={videoMessage} src="/video.mp4" radius={300} offsetX={1} zIndex={1}
+             shadowColor={"rgba(0,0,0,0.45)"}/>
+      <Circle ref={circleProgress} size={350} stroke={"rgba(255,255,255,0.66)"} lineWidth={0} lineCap="round" offsetX={1} zIndex={1} x={-5}
+              startAngle={-90} endAngle={createSignal(() => progress()*360-90)}/>
+    </Rect>
+    <Rect zIndex={2} layout x={-40} gap={5} y={-65} fill={"rgba(0,0,0,0.29)"} paddingLeft={5} paddingRight={5} radius={10}>
+      <Txt fill={"white"} fontFamily="Roboto" fontSize={19} fontWeight={300} marginTop={5}>9:05</Txt>
+      <Img src={"/read-video.svg"} size={22} marginTop={3}/>
+    </Rect>
+    <Rect ref={progressIndicator} zIndex={2} layout x={-310} gap={5} y={-65} fill={"rgba(0,0,0,0.29)"} paddingLeft={5} paddingRight={5} radius={10}>
+      <Txt fill={"white"} fontFamily="Roboto" fontSize={19} fontWeight={300} marginTop={5}
+           text={createSignal(()=> Math.floor(progress()).toString().padStart(2, '0')+":"
+               +(Math.floor(progress()%1 * 60) %60).toString().padStart(2, '0'))}/>
+      {/*<Img src={"/read-video.svg"} size={22} marginTop={3}/>*/}
+      <Rect ref={bars} layout gap={2} marginBottom={6} alignItems="end" opacity={0} marginRight={3}>
+        <Rect ref={bar1} fill={"white"} height={15} width={3}/>
+        <Rect ref={bar2} fill={"white"} height={15} width={3}/>
+        <Rect ref={bar3} fill={"white"} height={15} width={3}/>
+      </Rect>
+      <Circle ref={unread} size={8} fill="white" layout={false} x={25}/>
+    </Rect>
   </Rect>);
+  const anims = [];
+  const random = useRandom();
+  for (let i = 0; i < 88; i++) {
+    anims.push(all(
+        bar1().height(random.nextInt(5, 15), 0.15, linear),
+        bar2().height(random.nextInt(5, 15), 0.15, linear),
+        bar3().height(random.nextInt(5, 15), 0.15, linear),
+    ));
+  }
+  yield chain(...anims);
+  v1().seek(8);
+  v2().seek(4);
   yield all(
       message().y(message().y() - 380, 0.3, easeInOutCubic),
       messages().y(messages().y() - 380, 0.3, easeInOutCubic),
   );
-  yield* waitFor(2);
+  yield* waitFor(0.5);
+  videoMessage().play();
+  progress(0);
+  yield progress(1, 4, linear);
+  yield all(
+      unread().opacity(0, 0.3, easeInOutCubic),
+      bars().opacity(1, 0.3, easeInOutCubic),
+      circleProgress().lineWidth(5, 0.3, easeInOutCubic),
+      videoMessage().shadowBlur(10, 0.3, easeInOutCubic),
+      message().scale(1.4, 0.3, easeInOutCubic),
+      messages().y(messages().y() - 180, 0.3, easeInOutCubic),
+      message().y(message().y() - 150, 0.3, easeInOutCubic),
+      v1().x(-260, 0.3, easeInOutCubic),
+      v2().x(-300, 0.3, easeInOutCubic),
+      progressIndicator().x(-450, 0.3, easeInOutCubic),
+  );
+  yield* waitFor(4);
+  yield* all(
+      videoMessage().x(370, 0.3, easeInOutCubic),
+      circleProgress().x(370, 0.3, easeInOutCubic),
+      v1().opacity(1, 0.3, easeInOutCubic),
+      v1().scale(1.01, 0.3, easeInOutCubic),
+      v1().x(-180, 0.3, easeInOutCubic),
+      v2().x(-260, 0.3, easeInOutCubic),
+      v2().opacity(0.6, 0.3, easeInOutCubic),
+  );
+  yield progress(2, 4, linear);
+  v1().play();
+  circleProgress().x(-5);
+  yield* waitFor(4);
+  yield* all(
+      v1().x(370, 0.3, easeInOutCubic),
+      circleProgress().x(370, 0.3, easeInOutCubic),
+      v2().opacity(1, 0.3, easeInOutCubic),
+      v2().scale(1.01, 0.3, easeInOutCubic),
+      v2().x(-180, 0.3, easeInOutCubic),
+  );
+  yield progress(3, 4, linear);
+  v2().play();
+  circleProgress().x(-5);
+  yield* waitFor(4.01);
 
+  v2().pause();
+  v2().seek(0);
+  progress(3);
+  yield circleProgress().opacity(0, 0.1, easeInOutCubic);
+  yield all(
+      videoMessage().shadowBlur(0, 0.3, easeInOutCubic),
+      message().scale(1, 0.3, easeInOutCubic),
+      progressIndicator().x(-310, 0.3, easeInOutCubic),
+      messages().y(messages().y() + 180, 0.3, easeInOutCubic),
+      message().y(message().y() + 150, 0.3, easeInOutCubic),
+  );
+
+  yield* waitFor(1);
   yield* tween(0.8, value => {
     title().position.y(map(-425, 0, easeOutExpo(value)));
     screen().position.y(map(150, 800, easeOutExpo(value)));
