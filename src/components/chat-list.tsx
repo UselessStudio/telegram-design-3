@@ -19,8 +19,7 @@ export class ChatList extends Node {
     constructor(props?: NodeProps & ChatProps) {
         super(props);
         this.add(<Rect alignItems="stretch" gap={5} marginTop={2} grow={1}>
-            {props.locked ? <Video play={true} margin={10} src="/pd.mp4" radius={50} width={90} /> :
-                <Img margin={10} src={props.avatar} radius={50} width={90} />}
+            <Img margin={10} src={props.avatar} radius={50} width={90} />
 
             <Rect direction="column" grow={1} justifyContent="space-between">
                 <Rect grow={1} alignItems="center">

@@ -1,10 +1,11 @@
-import { Circle, ComponentChildren, Img, Node, NodeProps, Rect } from "@motion-canvas/2d";
+import {Circle, ComponentChildren, Gradient, Img, Node, NodeProps, Rect} from "@motion-canvas/2d";
 import { createRef, easeInOutCubic, Reference } from "@motion-canvas/core";
+import {PRIMARY} from "../scenes/example.js";
 
 export const SCREEN_WIDTH = 640;
 export const SCREEN_HEIGHT = 1280;
 export const SCREEN_BORDER = 20;
-const SCREEN_RADIUS = 64;
+export const SCREEN_RADIUS = 64;
 
 
 
@@ -18,12 +19,23 @@ export class PhoneScreen extends Node {
         this.container = createRef<Rect>();
         this.firstScreen = createRef<Rect>();
         this.statusbar = createRef<Img>();
+        const blurFix = new Gradient({
+            type: "linear",
+            fromX: -SCREEN_WIDTH/2,
+            fromY: -SCREEN_HEIGHT/2,
+            toX: SCREEN_WIDTH,
+            toY: SCREEN_HEIGHT,
+            stops: [
+                {offset: 0, color: PRIMARY},
+                {offset: 1, color: "white"}
+            ]
+        });
         this.add(
             <Rect radius={SCREEN_RADIUS}
                 x={this.x} y={this.y}
                 width={SCREEN_WIDTH} height={SCREEN_HEIGHT}
                 stroke={"#00000096"}
-                lineWidth={SCREEN_BORDER} fill={"white"} clip={true}>
+                lineWidth={SCREEN_BORDER} fill={blurFix} clip={true}>
                 <Rect layout ref={this.container} direction="row" fill="black" offset={[-1, -1]} alignItems="start"
                     x={-SCREEN_WIDTH / 2 + SCREEN_BORDER} y={-SCREEN_HEIGHT / 2 + SCREEN_BORDER}>
                     <Rect direction="column" ref={this.firstScreen} fill="white">
@@ -36,7 +48,7 @@ export class PhoneScreen extends Node {
                      y={-SCREEN_HEIGHT/2+SCREEN_BORDER+10}
                      offsetY={-1}/>
                 <Img src="/navbar.svg"
-                     width={SCREEN_WIDTH - SCREEN_BORDER*2}
+                     width={SCREEN_WIDTH - SCREEN_BORDER}
                      y={SCREEN_HEIGHT/2}
                      offsetY={1}/>
                 <Rect radius={SCREEN_RADIUS - SCREEN_BORDER / 2} x={0} y={0}
@@ -47,6 +59,10 @@ export class PhoneScreen extends Node {
                 </Rect>
             </Rect>,
         );
+    }
+
+    public *setBlur(blur: boolean) {
+        yield* this.container().filters.blur(blur ? 10 : 0, 0.3, easeInOutCubic);
     }
 
     public *setTheme(dark: boolean) {
